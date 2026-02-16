@@ -2,48 +2,38 @@ import streamlit as st
 import PyPDF2
 import google.generativeai as genai
 
-# --- 1. CONFIG ---
-st.set_page_config(page_title="Sheikh Nav-Sutra AI Pro", page_icon="🎬")
+# --- 1. SETTINGS ---
+st.set_page_config(page_title="Sheikh Nav-Sutra AI", page_icon="🎬")
 
 # Brain Connect
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
-    
-    # Sabse stable model try karte hain
+    # 2026 ka sabse stable engine
     model = genai.GenerativeModel('gemini-1.5-flash')
-except Exception as e:
-    st.error("⚠️ Setup Error! Please check your API Key in Secrets.")
+except:
+    st.error("⚠️ Secrets check karein!")
 
-# --- 2. THE NAV-SUTRA BRAIN ---
-def analyze_with_gemini(text):
-    prompt = f"""
-    You are Sohail Sheikh's expert script analyst. 
-    Analyze this script using the 'Sheikh Nav-Sutra' (9-Sutra) method.
-    Check structure from Shunya to Poornata.
-    Provide specific advice in Hindi/English mixed.
-    Script Content: {text[:15000]}
-    """
+# --- 2. ENGINE ---
+def analyze_script(text):
+    prompt = f"Analyze this script using Sohail Sheikh's 9-Sutra logic (Nav-Sutra). Focus on Shunya, Beej, and Garbh. Script: {text[:15000]}"
     try:
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"Model Error: {str(e)}. Please refresh or check API access."
+        return f"System Error: {str(e)}"
 
-# --- 3. UI DESIGN ---
+# --- 3. UI ---
 st.title("🎬 Sheikh Nav-Sutra AI: PRO")
-st.markdown("The Karma-GPS Engine for Professional Writers")
-
 uploaded_file = st.file_uploader("📂 PDF Script Upload Karein", type=['pdf'])
 
 if uploaded_file:
     reader = PyPDF2.PdfReader(uploaded_file)
     content = "".join([p.extract_text() for p in reader.pages])
-    st.success(f"✅ {uploaded_file.name} Scanned!")
-
+    st.success("✅ Script Scanned!")
+    
     if st.button("🧠 Deep Scan (Gemini Brain)"):
-        with st.spinner('Gemini is reading your script...'):
-            report = analyze_with_gemini(content)
-            st.markdown("---")
-            st.markdown("### 📊 THE NAV-SUTRA ANALYSIS REPORT")
+        with st.spinner('Gemini is reading...'):
+            report = analyze_script(content)
+            st.markdown("### 📊 THE NAV-SUTRA REPORT")
             st.write(report)
