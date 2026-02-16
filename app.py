@@ -2,31 +2,35 @@ import streamlit as st
 import PyPDF2
 import google.generativeai as genai
 
-# --- 1. CONFIGURATION ---
+# --- 1. CONFIG ---
 st.set_page_config(page_title="Sheikh Nav-Sutra AI Pro", page_icon="🎬")
 
-# Gemini Brain Link
+# Brain Connect
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
-    # Using the stable model name
+    
+    # Sabse stable model try karte hain
     model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
-    st.error("⚠️ API Key Error! Secrets check karein.")
+    st.error("⚠️ Setup Error! Please check your API Key in Secrets.")
 
-# --- 2. THE NAV-SUTRA ENGINE ---
+# --- 2. THE NAV-SUTRA BRAIN ---
 def analyze_with_gemini(text):
     prompt = f"""
-    You are Sohail Sheikh's expert script consultant. 
+    You are Sohail Sheikh's expert script analyst. 
     Analyze this script using the 'Sheikh Nav-Sutra' (9-Sutra) method.
     Check structure from Shunya to Poornata.
-    Give specific advice in Hindi/English mixed.
+    Provide specific advice in Hindi/English mixed.
     Script Content: {text[:15000]}
     """
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Model Error: {str(e)}. Please refresh or check API access."
 
-# --- 3. INTERFACE DESIGN ---
+# --- 3. UI DESIGN ---
 st.title("🎬 Sheikh Nav-Sutra AI: PRO")
 st.markdown("The Karma-GPS Engine for Professional Writers")
 
@@ -39,10 +43,7 @@ if uploaded_file:
 
     if st.button("🧠 Deep Scan (Gemini Brain)"):
         with st.spinner('Gemini is reading your script...'):
-            try:
-                report = analyze_with_gemini(content)
-                st.markdown("---")
-                st.markdown("### 📊 THE NAV-SUTRA ANALYSIS REPORT")
-                st.write(report)
-            except Exception as e:
-                st.error(f"Analysis failed: {e}")
+            report = analyze_with_gemini(content)
+            st.markdown("---")
+            st.markdown("### 📊 THE NAV-SUTRA ANALYSIS REPORT")
+            st.write(report)
